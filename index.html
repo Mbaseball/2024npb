@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>野球選手管理アプリ</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        input, select { margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>野球選手管理アプリ</h1>
+
+    <h2>打者追加</h2>
+    <input type="text" id="batterName" placeholder="名前">
+    <input type="number" id="batterSingleRate" placeholder="単打率" step="0.01" min="0" max="1">
+    <input type="number" id="batterDoubleRate" placeholder="二塁打率" step="0.01" min="0" max="1">
+    <input type="number" id="batterTripleRate" placeholder="三塁打率" step="0.01" min="0" max="1">
+    <input type="number" id="batterWalkRate" placeholder="四死球率" step="0.01" min="0" max="1">
+    <button id="addBatter">打者を追加</button>
+
+    <h2>投手追加</h2>
+    <input type="text" id="pitcherName" placeholder="名前">
+    <input type="number" id="pitcherAllowedSingleRate" placeholder="被単打率" step="0.01" min="0" max="1">
+    <input type="number" id="pitcherAllowedDoubleRate" placeholder="被二塁打率" step="0.01" min="0" max="1">
+    <input type="number" id="pitcherAllowedTripleRate" placeholder="被三塁打率" step="0.01" min="0" max="1">
+    <input type="number" id="pitcherAllowedHomeRunRate" placeholder="被本塁打率" step="0.01" min="0" max="1">
+    <input type="number" id="pitcherAllowedWalkRate" placeholder="与四死球率" step="0.01" min="0" max="1">
+    <button id="addPitcher">投手を追加</button>
+
+    <h2>結果を計算</h2>
+    <select id="batterSelect"></select>
+    <select id="pitcherSelect"></select>
+    <button id="calculateResult">結果を計算</button>
+    <p id="result"></p>
+
+    <script>
+        let batters = [];
+        let pitchers = [];
+
+        document.getElementById('addBatter').addEventListener('click', () => {
+            const name = document.getElementById('batterName').value;
+            const singleRate = parseFloat(document.getElementById('batterSingleRate').value);
+            const doubleRate = parseFloat(document.getElementById('batterDoubleRate').value);
+            const tripleRate = parseFloat(document.getElementById('batterTripleRate').value);
+            const walkRate = parseFloat(document.getElementById('batterWalkRate').value);
+
+            const batter = { name, singleRate, doubleRate, tripleRate, walkRate };
+            batters.push(batter);
+            updateBatterSelect();
+            clearBatterInputs();
+        });
+
+        document.getElementById('addPitcher').addEventListener('click', () => {
+            const name = document.getElementById('pitcherName').value;
+            const allowedSingleRate = parseFloat(document.getElementById('pitcherAllowedSingleRate').value);
+            const allowedDoubleRate = parseFloat(document.getElementById('pitcherAllowedDoubleRate').value);
+            const allowedTripleRate = parseFloat(document.getElementById('pitcherAllowedTripleRate').value);
+            const allowedHomeRunRate = parseFloat(document.getElementById('pitcherAllowedHomeRunRate').value);
+            const allowedWalkRate = parseFloat(document.getElementById('pitcherAllowedWalkRate').value);
+
+            const pitcher = { name, allowedSingleRate, allowedDoubleRate, allowedTripleRate, allowedHomeRunRate, allowedWalkRate };
+            pitchers.push(pitcher);
+            updatePitcherSelect();
+            clearPitcherInputs();
+        });
+
+        document.getElementById('calculateResult').addEventListener('click', () => {
+            const batterIndex = document.getElementById('batterSelect').value;
+            const pitcherIndex = document.getElementById('pitcherSelect').value;
+
+            if (batterIndex === null || pitcherIndex === null) {
+                alert('選手を選択してください');
+                return;
+            }
+
+            const batter = batters[batterIndex];
+            const pitcher = pitchers[pitcherIndex];
+            const result = calculateResult(batter, pitcher);
+            document.getElementById('result').textContent = result;
+        });
+
+        function updateBatterSelect() {
+            const batterSelect = document.getElementById('batterSelect');
+            batterSelect.innerHTML = '';
+            batters.forEach((batter, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = batter.name;
+                batterSelect.appendChild(option);
+            });
+        }
+
+        function updatePitcherSelect() {
+            const pitcherSelect = document.getElementById('pitcherSelect');
+            pitcherSelect.innerHTML = '';
+            pitchers.forEach((pitcher, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = pitcher.name;
+                pitcherSelect.appendChild(option);
+            });
+        }
+
+        function calculateResult(batter, pitcher) {
+            const hitProbability = (batter.singleRate + batter.doubleRate + batter.tripleRate + batter.walkRate) / 4;
+            const allowedHitProbability = (pitcher.allowedSingleRate + pitcher.allowedDoubleRate + pitcher.allowedTripleRate + pitcher.allowedHomeRunRate + pitcher.allowedWalkRate) / 5;
+
+            const randomValue = Math.random();
+            if (randomValue < hitProbability) {
+                return "ヒット！";
+            } else {
+                return "アウト！";
+            }
+        }
+
+        function clearBatterInputs() {
+            document.getElementById('batterName').value = '';
+            document.getElementById('batterSingleRate').value = '';
+            document.getElementById('batterDoubleRate').value = '';
+            document.getElementById('batterTripleRate').value = '';
+            document.getElementById('batterWalkRate').value = '';
+        }
+
+        function clearPitcherInputs() {
+            document.getElementById('pitcherName').value = '';
+            document.getElementById('pitcherAllowedSingleRate').value = '';
+            document.getElementById('pitcherAllowedDoubleRate').value = '';
+            document.getElementById('pitcherAllowedTripleRate').value = '';
+            document.getElementById('pitcherAllowedHomeRunRate').value = '';
+            document.getElementById('pitcherAllowedWalkRate').value = '';
+        }
+    </script>
+</body>
+</html>
